@@ -1,0 +1,24 @@
+{
+  "name": "Atelier by Elian",
+  "short_name": "Atelier",
+  "description": "Jewelry Intelligence — Track, Price & Sell",
+  "start_url": "./JewelryTracker_v2.html",
+  "display": "standalone",
+  "background_color": "#080808",
+  "theme_color": "#C9963C",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
