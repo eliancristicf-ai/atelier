@@ -1,0 +1,2321 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Atelier by Elian</title>
+<meta name="application-name" content="Atelier">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Atelier">
+<meta name="theme-color" content="#C9963C">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Josefin+Sans:wght@200;300;400;600&display=swap');
+
+:root {
+  --black: #080808;
+  --deep: #0F0F0F;
+  --surface: #161616;
+  --panel: #1E1E1E;
+  --border: #2A2A2A;
+  --gold: #C9963C;
+  --gold2: #E8C97A;
+  --gold3: #F5E6B8;
+  --rose: #C47A7A;
+  --sage: #6B9E7E;
+  --muted: #666;
+  --text: #E8E2D8;
+  --text2: #A09890;
+  --danger: #C0392B;
+  --success: #5B9E6E;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Josefin Sans', sans-serif;
+  background: var(--black);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* CUSTOM CURSOR */
+#cursor {
+  position: fixed;
+  width: 8px; height: 8px;
+  background: var(--gold);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  transition: transform 0.15s, opacity 0.15s;
+  transform: translate(-50%, -50%);
+}
+#cursor-ring {
+  position: fixed;
+  width: 28px; height: 28px;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99998;
+  transition: transform 0.4s cubic-bezier(.17,.67,.35,1.2), opacity 0.3s;
+  transform: translate(-50%, -50%);
+  opacity: 0.5;
+}
+body:hover #cursor { opacity: 1; }
+
+/* PARTICLES */
+#particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.particle {
+  position: absolute;
+  width: 1px; height: 1px;
+  background: var(--gold);
+  border-radius: 50%;
+  opacity: 0;
+  animation: float-particle linear infinite;
+}
+@keyframes float-particle {
+  0% { opacity: 0; transform: translateY(0) scale(1); }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.3; }
+  100% { opacity: 0; transform: translateY(-100vh) scale(0); }
+}
+
+/* HEADER */
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(8,8,8,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+.logo-mark {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  font-style: italic;
+  color: var(--gold2);
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.logo-mark span { color: var(--gold); font-style: normal; font-size: 1rem; }
+.header-kpis {
+  display: flex;
+  gap: 28px;
+}
+.hkpi { text-align: center; }
+.hkpi-val {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--gold2);
+  letter-spacing: 1px;
+}
+.hkpi-lbl {
+  font-size: 0.6rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-top: 1px;
+}
+
+/* NAV */
+nav {
+  background: var(--deep);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  padding: 0 24px;
+  gap: 2px;
+}
+.nav-tab {
+  padding: 12px 20px;
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+.nav-tab:hover { color: var(--gold2); }
+.nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* MAIN */
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.section { display: none; animation: fadeUp 0.4s ease; }
+.section.active { display: block; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* SECTION HEADER */
+.sec-header {
+  margin-bottom: 28px;
+}
+.sec-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-style: italic;
+  color: var(--gold3);
+  letter-spacing: 1px;
+  line-height: 1.2;
+}
+.sec-sub {
+  font-size: 0.72rem;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+/* CARD BASE */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* ANALYZER */
+.upload-zone {
+  position: relative;
+  border: 1px dashed var(--gold);
+  border-radius: 4px;
+  margin-bottom: 20px;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: background 0.3s, border-color 0.3s;
+  background: #0D0D0D;
+  overflow: hidden;
+}
+.upload-zone:hover { background: #111; border-color: var(--gold2); }
+.upload-zone input[type=file] {
+  position: absolute; inset: 0;
+  opacity: 0; cursor: pointer; width: 100%; height: 100%;
+}
+.upload-icon-large { font-size: 2.5rem; opacity: 0.4; }
+.upload-label {
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.upload-sub { font-size: 0.72rem; color: var(--muted); }
+#preview-wrap {
+  position: absolute; inset: 0;
+  display: none;
+}
+#preview-wrap img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  background: #0a0a0a;
+}
+.preview-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%);
+  display: flex;
+  align-items: flex-end;
+  padding: 16px;
+}
+.preview-change {
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: rgba(0,0,0,0.6);
+  padding: 6px 12px;
+  border: 1px solid var(--gold);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+/* FORM ELEMENTS */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+.form-row.one { grid-template-columns: 1fr; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label {
+  font-size: 0.62rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.field input, .field select, .field textarea {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  color: var(--text);
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.85rem;
+  padding: 10px 14px;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+  background: #1A1A1A;
+}
+.field select option { background: var(--panel); }
+.field textarea { resize: vertical; min-height: 80px; }
+
+.url-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.url-row input {
+  flex: 1;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  color: var(--text);
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.82rem;
+  padding: 10px 14px;
+}
+.url-row input:focus { outline: none; border-color: var(--gold); }
+
+/* BUTTONS */
+.btn {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.btn-gold {
+  background: var(--gold);
+  color: var(--black);
+}
+.btn-gold:hover { background: var(--gold2); }
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+}
+.btn-outline:hover { background: var(--gold); color: var(--black); }
+.btn-danger {
+  background: transparent;
+  border: 1px solid #333;
+  color: #666;
+  font-size: 0.65rem;
+}
+.btn-danger:hover { border-color: var(--danger); color: var(--danger); }
+.btn-sm { padding: 8px 16px; font-size: 0.62rem; }
+.btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 16px;
+}
+
+/* SPINNER */
+.spinner-wrap {
+  display: none;
+  text-align: center;
+  padding: 40px;
+}
+.spinner-wrap.show { display: block; }
+.spinner-ring {
+  width: 40px; height: 40px;
+  border: 1px solid var(--border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 14px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner-text {
+  font-size: 0.68rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* AI RESULT */
+.ai-result {
+  display: none;
+  margin-top: 24px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.ai-result.show { display: block; animation: fadeUp 0.5s ease; }
+.ai-result-header {
+  background: linear-gradient(135deg, #1A1208, #100D05);
+  border-bottom: 1px solid var(--gold);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ai-result-header h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--gold2);
+}
+.ai-orb {
+  width: 8px; height: 8px;
+  background: var(--gold);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--gold);
+  animation: pulse-orb 2s infinite;
+}
+@keyframes pulse-orb {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--gold); }
+  50% { opacity: 0.5; box-shadow: 0 0 2px var(--gold); }
+}
+.ai-result-body { padding: 20px; background: var(--surface); }
+
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.kpi-box {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 14px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-box::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transition: transform 0.4s;
+}
+.kpi-box.loaded::after { transform: scaleX(1); }
+.kpi-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  color: var(--gold2);
+  font-weight: 600;
+}
+.kpi-lbl {
+  font-size: 0.6rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+.info-block {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+.info-block-label {
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.info-block-text {
+  font-size: 0.85rem;
+  color: var(--text2);
+  line-height: 1.7;
+}
+
+/* PRICING SUGGESTIONS */
+.price-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.price-opt {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.price-opt:hover { border-color: var(--gold); }
+.price-opt.selected { border-color: var(--gold); background: #1A1208; }
+.price-opt-tier {
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.price-opt-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  color: var(--gold2);
+  font-weight: 600;
+}
+.price-opt-margin {
+  font-size: 0.65rem;
+  color: var(--success);
+  margin-top: 3px;
+}
+.price-opt-label {
+  font-size: 0.62rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* HASHTAGS */
+.tags-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag {
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tag:hover { border-color: var(--gold); color: var(--gold); }
+
+/* PLATFORM COMPARE */
+.platform-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.plat-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 14px;
+}
+.plat-name {
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.plat-score {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  color: var(--gold2);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.plat-reason { font-size: 0.72rem; color: var(--muted); line-height: 1.5; }
+.plat-badge {
+  display: inline-block;
+  font-size: 0.58rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-top: 6px;
+}
+.plat-badge.best { background: #1A2A1A; color: var(--success); border: 1px solid var(--success); }
+.plat-badge.good { background: #1A1A2A; color: #7A9EC4; border: 1px solid #7A9EC4; }
+.plat-badge.ok { background: #2A1A1A; color: var(--rose); border: 1px solid var(--rose); }
+
+/* MOOD BOARD */
+.mood-board {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  align-items: center;
+}
+.mood-swatch {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.mood-swatch:hover { transform: scale(1.2); }
+.mood-label {
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 1px;
+  margin-left: 8px;
+}
+
+/* LISTING GENERATOR */
+.listing-box {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.listing-title-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  color: var(--gold3);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+.listing-desc {
+  font-size: 0.8rem;
+  color: var(--text2);
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+.char-count {
+  font-size: 0.62rem;
+  color: var(--muted);
+  margin-top: 6px;
+  text-align: right;
+}
+
+/* INVENTORY */
+.inv-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.inv-bar input, .inv-bar select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  color: var(--text);
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.78rem;
+  padding: 9px 12px;
+  flex: 1; min-width: 120px;
+}
+.inv-bar input:focus, .inv-bar select:focus { outline: none; border-color: var(--gold); }
+
+.inv-empty {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--muted);
+}
+.inv-empty-icon { font-size: 3rem; margin-bottom: 16px; opacity: 0.3; }
+.inv-empty p { font-size: 0.75rem; letter-spacing: 1px; }
+
+/* JEWELRY CARDS */
+.inv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+.jcard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  transition: border-color 0.3s, transform 0.3s;
+  cursor: pointer;
+}
+.jcard:hover { border-color: var(--gold); transform: translateY(-3px); }
+.jcard-img {
+  width: 100%; height: 170px;
+  background: var(--panel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  position: relative;
+  overflow: hidden;
+}
+.jcard-img img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+.jcard:hover .jcard-img img { transform: scale(1.05); }
+.jcard-status {
+  position: absolute;
+  top: 10px; right: 10px;
+  font-size: 0.58rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+.s-stock { background: rgba(91,158,110,0.2); color: var(--success); border: 1px solid rgba(91,158,110,0.4); }
+.s-listed { background: rgba(122,158,196,0.2); color: #7A9EC4; border: 1px solid rgba(122,158,196,0.4); }
+.s-sold { background: rgba(192,57,43,0.2); color: #E07060; border: 1px solid rgba(192,57,43,0.4); }
+.jcard-body { padding: 14px; }
+.jcard-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--gold3);
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.jcard-type {
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.jcard-prices {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 10px;
+}
+.jcard-cost { font-size: 0.72rem; color: var(--muted); }
+.jcard-price {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  color: var(--gold2);
+  font-weight: 600;
+}
+.jcard-profit {
+  font-size: 0.68rem;
+  color: var(--success);
+  letter-spacing: 0.5px;
+}
+.jcard-actions {
+  display: flex;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+/* STATS */
+.stats-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.skpi {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.skpi::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.skpi-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.2rem;
+  color: var(--gold2);
+  font-weight: 300;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.skpi-lbl {
+  font-size: 0.62rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.skpi-trend {
+  font-size: 0.72rem;
+  color: var(--success);
+  margin-top: 4px;
+}
+
+.breakdown-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.breakdown-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.68rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.breakdown-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  gap: 16px;
+}
+.breakdown-row:last-child { border-bottom: none; }
+.breakdown-name { flex: 1; font-size: 0.82rem; color: var(--text2); }
+.breakdown-bar-wrap { flex: 2; height: 3px; background: var(--border); border-radius: 2px; }
+.breakdown-bar { height: 100%; background: var(--gold); border-radius: 2px; transition: width 1s ease; }
+.breakdown-vals { display: flex; gap: 20px; }
+.breakdown-val { text-align: right; }
+.breakdown-val-num { font-size: 0.85rem; color: var(--gold2); }
+.breakdown-val-lbl { font-size: 0.58rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+
+/* QUICK CALC */
+.calc-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.calc-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-style: italic;
+  color: var(--gold3);
+  margin-bottom: 16px;
+}
+.calc-result {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+}
+.calc-tier {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 16px;
+  text-align: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+.calc-tier:hover { border-color: var(--gold); background: #1A1208; }
+.calc-tier-name {
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.calc-tier-price {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  color: var(--gold2);
+  font-weight: 600;
+}
+.calc-tier-margin { font-size: 0.68rem; color: var(--success); margin-top: 4px; }
+.calc-tier-desc { font-size: 0.65rem; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+
+/* MODAL */
+.modal-bg {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+.modal-bg.open { display: flex; animation: fadeIn 0.2s; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  max-width: 580px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.modal-head {
+  background: linear-gradient(135deg, #1A1208, var(--panel));
+  border-bottom: 1px solid var(--gold);
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 1;
+}
+.modal-head h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-style: italic;
+  color: var(--gold2);
+}
+.modal-close {
+  background: none; border: none;
+  color: var(--muted); font-size: 1.2rem;
+  cursor: pointer; padding: 4px 8px;
+  transition: color 0.2s;
+}
+.modal-close:hover { color: var(--gold); }
+.modal-body { padding: 22px; }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 28px; right: 28px;
+  background: var(--surface);
+  border: 1px solid var(--gold);
+  border-left: 3px solid var(--gold);
+  color: var(--gold2);
+  padding: 12px 20px;
+  border-radius: 2px;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  z-index: 9999;
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(.17,.67,.35,1.2);
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* ALERT BANNER */
+.alert-banner {
+  background: linear-gradient(135deg, #1A0D08, #120808);
+  border: 1px solid rgba(192,57,43,0.4);
+  border-radius: 2px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.75rem;
+  color: #E07060;
+  display: none;
+}
+.alert-banner.show { display: flex; }
+
+/* DIVIDER */
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 20px 0;
+}
+
+/* RESPONSIVE */
+@media (max-width: 640px) {
+  .form-row { grid-template-columns: 1fr; }
+  .form-row.three { grid-template-columns: 1fr 1fr; }
+  .kpi-row { grid-template-columns: 1fr 1fr; }
+  .price-options { grid-template-columns: 1fr; }
+  .platform-grid { grid-template-columns: 1fr; }
+  .calc-result { grid-template-columns: 1fr; }
+  .header-kpis { gap: 16px; }
+  .hkpi-val { font-size: 0.88rem; }
+}
+
+/* COPY FLASH */
+@keyframes copy-flash {
+  0% { background: var(--gold); }
+  100% { background: transparent; }
+}
+.copied { animation: copy-flash 0.4s ease; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--black); }
+::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<div id="particles"></div>
+
+<header>
+  <div class="logo-mark">
+    <span>✦</span> Atelier
+  </div>
+  <div class="header-kpis">
+    <div class="hkpi">
+      <div class="hkpi-val" id="h-pieces">0</div>
+      <div class="hkpi-lbl">Piese</div>
+    </div>
+    <div class="hkpi">
+      <div class="hkpi-val" id="h-sold">0</div>
+      <div class="hkpi-lbl">Vândute</div>
+    </div>
+    <div class="hkpi">
+      <div class="hkpi-val" id="h-revenue">£0</div>
+      <div class="hkpi-lbl">Venit</div>
+    </div>
+    <div class="hkpi">
+      <div class="hkpi-val" id="h-profit">£0</div>
+      <div class="hkpi-lbl">Profit</div>
+    </div>
+
+  </div>
+</header>
+
+<nav>
+  <div class="nav-tab active" data-tab="analyzer">✦ AI Analyzer</div>
+  <div class="nav-tab" data-tab="listing">📝 Listing Generator</div>
+  <div class="nav-tab" data-tab="calc">💰 Price Calculator</div>
+  <div class="nav-tab" data-tab="inventory">💍 Inventar</div>
+  <div class="nav-tab" data-tab="stats">◎ Statistici</div>
+  <div class="nav-tab" id="key-status" onclick="openKeyModal()" style="color:var(--rose);min-width:60px;">○ API</div>
+</nav>
+
+<main>
+
+<!-- ═══════════════════════ AI ANALYZER ═══════════════════════ -->
+<div id="sec-analyzer" class="section active">
+  <div class="sec-header">
+    <h2 class="sec-title">Analizator AI</h2>
+    <p class="sec-sub">Fotografiază · Analizează · Listează · Câștigă</p>
+  </div>
+
+  <div class="alert-banner" id="stale-alert">
+    ⚠️ Ai {{ N }} piese nevândute în stoc — verifică inventarul și ajustează prețurile.
+  </div>
+
+  <!-- UPLOAD -->
+  <div class="upload-zone" id="upload-zone">
+    <input type="file" id="file-input" accept="image/*" capture="environment" onchange="handleFile(event)">
+    <div class="upload-icon-large">◎</div>
+    <div class="upload-label">Încarcă fotografia bijuteriei</div>
+    <div class="upload-sub">JPG, PNG, WEBP · orice rezoluție</div>
+    <div id="preview-wrap">
+      <img id="preview-img" src="" alt="preview">
+      <div class="preview-overlay">
+        <div class="preview-change" onclick="event.stopPropagation(); document.getElementById('file-input').click()">↺ Schimbă imaginea</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="url-row">
+    <input type="text" id="img-url" placeholder="Sau lipește URL imagine de pe net (Pinterest, Google Images...)">
+    <button class="btn btn-ghost btn-sm" onclick="loadUrl()">↓ Încarcă</button>
+  </div>
+
+  <div class="form-row three">
+    <div class="field">
+      <label>Tip bijuterie</label>
+      <select id="j-type">
+        <option value="">Auto-detectat</option>
+        <option value="brățară">Brățară</option>
+        <option value="cercei">Cercei</option>
+        <option value="colier">Colier</option>
+        <option value="inel">Inel</option>
+        <option value="set">Set complet</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Platformă principală</label>
+      <select id="j-platform">
+        <option value="Etsy">Etsy</option>
+        <option value="TikTok Shop">TikTok Shop</option>
+        <option value="Local / Piețe">Local / Piețe</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Ocazie / Stil</label>
+      <select id="j-occasion">
+        <option value="">General</option>
+        <option value="everyday wear">Purtare zilnică</option>
+        <option value="bridal">Nuntă / Mireasă</option>
+        <option value="gift">Cadou</option>
+        <option value="boho">Boho / Festival</option>
+        <option value="luxury">Luxury / Statement</option>
+        <option value="minimalist">Minimalist</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-row one">
+    <div class="field">
+      <label>Detalii suplimentare (opțional)</label>
+      <input type="text" id="j-extra" placeholder="ex: perle naturale de apă dulce, argint 925, cristale Swarovski...">
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-gold" onclick="runAnalysis()">✦ Analizează cu AI</button>
+    <button class="btn btn-ghost" onclick="clearAll()">↺ Resetează</button>
+  </div>
+
+  <div class="spinner-wrap" id="spinner">
+    <div class="spinner-ring"></div>
+    <div class="spinner-text">Claude procesează imaginea...</div>
+  </div>
+
+  <!-- AI RESULT -->
+  <div class="ai-result" id="ai-result">
+    <div class="ai-result-header">
+      <div class="ai-orb"></div>
+      <h3>Analiză completă</h3>
+    </div>
+    <div class="ai-result-body">
+
+      <!-- KPIs -->
+      <div class="kpi-row">
+        <div class="kpi-box" id="kpi-type">
+          <div class="kpi-val" id="r-type">—</div>
+          <div class="kpi-lbl">Tip detectat</div>
+        </div>
+        <div class="kpi-box" id="kpi-cost">
+          <div class="kpi-val" id="r-cost">—</div>
+          <div class="kpi-lbl">Cost estimat</div>
+        </div>
+        <div class="kpi-box" id="kpi-price">
+          <div class="kpi-val" id="r-price">—</div>
+          <div class="kpi-lbl">Preț recomandat</div>
+        </div>
+        <div class="kpi-box" id="kpi-margin">
+          <div class="kpi-val" id="r-margin">—</div>
+          <div class="kpi-lbl">Margine profit</div>
+        </div>
+      </div>
+
+      <!-- MOOD COLORS -->
+      <div class="info-block">
+        <div class="info-block-label">Paleta cromatică detectată</div>
+        <div class="mood-board" id="r-mood">
+          <span class="mood-label">Se analizează culorile...</span>
+        </div>
+      </div>
+
+      <!-- MATERIALS -->
+      <div class="info-block">
+        <div class="info-block-label">
+          Materii prime necesare
+          <button class="btn btn-ghost btn-sm" onclick="copyEl('r-materials')">↗ Copiază</button>
+        </div>
+        <div class="info-block-text" id="r-materials">—</div>
+      </div>
+
+      <!-- PRICE OPTIONS -->
+      <div class="info-block">
+        <div class="info-block-label">Strategii de preț</div>
+        <div class="price-options" id="r-prices"></div>
+      </div>
+
+      <!-- PLATFORM COMPARE -->
+      <div class="info-block">
+        <div class="info-block-label">Comparator platforme</div>
+        <div class="platform-grid" id="r-platforms"></div>
+      </div>
+
+      <!-- MARKETING TEXT -->
+      <div class="info-block">
+        <div class="info-block-label">
+          Text marketing
+          <button class="btn btn-ghost btn-sm" onclick="copyEl('r-marketing')">↗ Copiază</button>
+        </div>
+        <div class="info-block-text" id="r-marketing">—</div>
+      </div>
+
+      <!-- HASHTAGS -->
+      <div class="info-block">
+        <div class="info-block-label">
+          Hashtag-uri
+          <button class="btn btn-ghost btn-sm" onclick="copyHashtags()">↗ Copiază toate</button>
+        </div>
+        <div class="tags-wrap" id="r-hashtags"></div>
+      </div>
+
+      <!-- TIP -->
+      <div class="info-block">
+        <div class="info-block-label">Sfat platformă</div>
+        <div class="info-block-text" id="r-tip">—</div>
+      </div>
+
+      <hr class="divider">
+      <div class="btn-row">
+        <button class="btn btn-gold" onclick="openSave()">✦ Salvează în inventar</button>
+        <button class="btn btn-outline" onclick="goListing()">↗ Generează listing Etsy</button>
+        <button class="btn btn-ghost" onclick="copyEl('r-marketing')">↗ Copiază marketing</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ LISTING GENERATOR ═══════════════════════ -->
+<div id="sec-listing" class="section">
+  <div class="sec-header">
+    <h2 class="sec-title">Listing Generator</h2>
+    <p class="sec-sub">Titlu SEO · Descriere completă · Tags Etsy · Shipping</p>
+  </div>
+
+  <div class="card" style="padding:24px; margin-bottom:20px;">
+    <div class="form-row">
+      <div class="field">
+        <label>Tip bijuterie</label>
+        <select id="lg-type">
+          <option value="bracelet">Brățară / Bracelet</option>
+          <option value="earrings">Cercei / Earrings</option>
+          <option value="necklace">Colier / Necklace</option>
+          <option value="ring">Inel / Ring</option>
+          <option value="set">Set bijuterii</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Material principal</label>
+        <input type="text" id="lg-material" placeholder="ex: perle naturale, cristale, argint 925">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>Stil / Ocazie</label>
+        <input type="text" id="lg-style" placeholder="ex: boho, minimalist, bridal, everyday">
+      </div>
+      <div class="field">
+        <label>Preț de vânzare (£)</label>
+        <input type="number" id="lg-price" placeholder="ex: 24.99" step="0.01" min="0">
+      </div>
+    </div>
+    <div class="form-row one">
+      <div class="field">
+        <label>Detalii unice (ce o face specială?)</label>
+        <input type="text" id="lg-unique" placeholder="ex: handmade, one-of-a-kind, personalizabilă, giftable">
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="generateListing()">✦ Generează listing complet</button>
+    </div>
+  </div>
+
+  <div class="spinner-wrap" id="lg-spinner">
+    <div class="spinner-ring"></div>
+    <div class="spinner-text">Se generează listing-ul Etsy...</div>
+  </div>
+
+  <div id="lg-result" style="display:none;">
+
+    <div class="listing-box">
+      <div class="info-block-label" style="margin-bottom:10px;">
+        Titlu Etsy (SEO optimizat)
+        <button class="btn btn-ghost btn-sm" onclick="copyEl('lg-title')">↗ Copiază</button>
+      </div>
+      <div class="listing-title-text" id="lg-title">—</div>
+      <div class="char-count" id="lg-title-chars"></div>
+    </div>
+
+    <div class="listing-box">
+      <div class="info-block-label" style="margin-bottom:10px;">
+        Descriere produs (140 cuvinte)
+        <button class="btn btn-ghost btn-sm" onclick="copyEl('lg-desc')">↗ Copiază</button>
+      </div>
+      <div class="listing-desc" id="lg-desc">—</div>
+    </div>
+
+    <div class="listing-box">
+      <div class="info-block-label" style="margin-bottom:10px;">
+        Tags Etsy (13 tags)
+        <button class="btn btn-ghost btn-sm" onclick="copyEl('lg-tags')">↗ Copiază</button>
+      </div>
+      <div class="tags-wrap" id="lg-tags-wrap"></div>
+      <div id="lg-tags" style="display:none;"></div>
+    </div>
+
+    <div class="listing-box">
+      <div class="info-block-label" style="margin-bottom:10px;">Shipping & Packaging</div>
+      <div class="info-block-text" id="lg-shipping">—</div>
+    </div>
+
+    <div class="listing-box">
+      <div class="info-block-label" style="margin-bottom:10px;">TikTok Hook (primele 3 secunde)</div>
+      <div class="info-block-text" id="lg-hook" style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:italic;color:var(--gold3);">—</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="openSaveFromListing()">✦ Salvează în inventar</button>
+      <button class="btn btn-ghost" onclick="copyAll()">↗ Copiază tot</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PRICE CALCULATOR ═══════════════════════ -->
+<div id="sec-calc" class="section">
+  <div class="sec-header">
+    <h2 class="sec-title">Price Calculator</h2>
+    <p class="sec-sub">Costul real · Margini corecte · Prețuri pe 3 niveluri</p>
+  </div>
+
+  <div class="calc-box">
+    <div class="calc-title">Introdu costurile tale</div>
+    <div class="form-row three">
+      <div class="field">
+        <label>Materiale (£)</label>
+        <input type="number" id="c-mat" placeholder="0.00" step="0.01" min="0" oninput="calcPrice()">
+      </div>
+      <div class="field">
+        <label>Timp lucru (ore)</label>
+        <input type="number" id="c-time" placeholder="0" step="0.5" min="0" oninput="calcPrice()">
+      </div>
+      <div class="field">
+        <label>Tarif orar (£/h)</label>
+        <input type="number" id="c-rate" placeholder="12" step="0.5" min="0" oninput="calcPrice()">
+      </div>
+    </div>
+    <div class="form-row three">
+      <div class="field">
+        <label>Packaging (£)</label>
+        <input type="number" id="c-pack" placeholder="0.50" step="0.01" min="0" oninput="calcPrice()">
+      </div>
+      <div class="field">
+        <label>Taxe platformă (%)</label>
+        <input type="number" id="c-fees" placeholder="6.5" step="0.5" min="0" oninput="calcPrice()">
+      </div>
+      <div class="field">
+        <label>Livrare (£)</label>
+        <input type="number" id="c-ship" placeholder="3.50" step="0.10" min="0" oninput="calcPrice()">
+      </div>
+    </div>
+
+    <div id="calc-result" style="display:none;">
+      <hr class="divider">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div>
+          <div style="font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">Cost total real</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--gold2);" id="c-total">£0.00</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">Break-even</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--rose);" id="c-breakeven">£0.00</div>
+        </div>
+      </div>
+      <div class="calc-result">
+        <div class="calc-tier">
+          <div class="calc-tier-name">Budget</div>
+          <div class="calc-tier-price" id="c-budget">£0</div>
+          <div class="calc-tier-margin" id="c-bm">×0</div>
+          <div class="calc-tier-desc">Piețe locale<br>TikTok entry</div>
+        </div>
+        <div class="calc-tier">
+          <div class="calc-tier-name">Standard</div>
+          <div class="calc-tier-price" id="c-standard">£0</div>
+          <div class="calc-tier-margin" id="c-sm">×0</div>
+          <div class="calc-tier-desc">Etsy<br>Instagram</div>
+        </div>
+        <div class="calc-tier">
+          <div class="calc-tier-name">Premium</div>
+          <div class="calc-tier-price" id="c-premium">£0</div>
+          <div class="calc-tier-margin" id="c-pm">×0</div>
+          <div class="calc-tier-desc">Etsy featured<br>Gift market</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="padding:20px;">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:italic;color:var(--gold3);margin-bottom:14px;">Ghid prețuri handmade UK</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:0.78rem;color:var(--text2);line-height:1.7;">
+      <div>✦ Etsy standard: 6.5% comision + £0.16 listing<br>✦ TikTok Shop: 2-5% comision<br>✦ PayPal/Stripe: ~2.9% + £0.30<br>✦ Minim recomandat: 3× costul materialelor</div>
+      <div>✦ Brățări: £12 – £45 pe Etsy UK<br>✦ Cercei: £8 – £35<br>✦ Coliere: £18 – £65<br>✦ Seturi: £35 – £120</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ INVENTORY ═══════════════════════ -->
+<div id="sec-inventory" class="section">
+  <div class="sec-header">
+    <h2 class="sec-title">Inventar</h2>
+    <p class="sec-sub">Stoc · Listate · Vândute</p>
+  </div>
+
+  <div class="inv-bar">
+    <input type="text" id="inv-search" placeholder="🔍 Caută..." oninput="renderInv()">
+    <select id="inv-type" onchange="renderInv()">
+      <option value="">Toate tipurile</option>
+      <option value="brățară">Brățări</option>
+      <option value="cercei">Cercei</option>
+      <option value="colier">Coliere</option>
+      <option value="inel">Inele</option>
+      <option value="set">Seturi</option>
+    </select>
+    <select id="inv-status" onchange="renderInv()">
+      <option value="">Toate</option>
+      <option value="in-stock">În stoc</option>
+      <option value="listed">Listate</option>
+      <option value="sold">Vândute</option>
+    </select>
+    <select id="inv-sort" onchange="renderInv()">
+      <option value="date-desc">Recente</option>
+      <option value="price-desc">Preț ↓</option>
+      <option value="profit-desc">Profit ↓</option>
+    </select>
+    <button class="btn btn-gold btn-sm" onclick="openAddModal()">+ Adaugă</button>
+    <button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ CSV</button>
+  </div>
+
+  <div class="inv-grid" id="inv-grid"></div>
+  <div class="inv-empty" id="inv-empty" style="display:none;">
+    <div class="inv-empty-icon">◎</div>
+    <p>Nici o bijuterie în inventar<br>Analizează cu AI sau adaugă manual</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════ STATS ═══════════════════════ -->
+<div id="sec-stats" class="section">
+  <div class="sec-header">
+    <h2 class="sec-title">Statistici</h2>
+    <p class="sec-sub">Performanța atelierului tău</p>
+  </div>
+
+  <div class="stats-kpis" id="stats-kpis"></div>
+
+  <div class="breakdown-section" id="breakdown-section">
+    <div class="breakdown-header">Defalcare pe tip de bijuterie</div>
+    <div id="breakdown-rows"></div>
+  </div>
+
+  <div class="breakdown-section" style="margin-top:16px;">
+    <div class="breakdown-header">Defalcare pe platformă</div>
+    <div id="plat-rows"></div>
+  </div>
+</div>
+
+</main>
+
+<!-- SAVE MODAL -->
+<div class="modal-bg" id="save-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Salvează în inventar</h3>
+      <button class="modal-close" onclick="closeModal('save-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row one">
+        <div class="field">
+          <label>Nume bijuterie *</label>
+          <input type="text" id="sv-name" placeholder="ex: Brățară perle roz cu charm auriu">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Tip</label>
+          <select id="sv-type">
+            <option value="brățară">Brățară</option>
+            <option value="cercei">Cercei</option>
+            <option value="colier">Colier</option>
+            <option value="inel">Inel</option>
+            <option value="set">Set</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select id="sv-status">
+            <option value="in-stock">În stoc</option>
+            <option value="listed">Listat online</option>
+            <option value="sold">Vândut</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Cost materiale (£)</label>
+          <input type="number" id="sv-cost" step="0.01" min="0" value="0">
+        </div>
+        <div class="field">
+          <label>Preț vânzare (£)</label>
+          <input type="number" id="sv-price" step="0.01" min="0" value="0">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Platformă</label>
+          <select id="sv-platform">
+            <option>Etsy</option>
+            <option>TikTok Shop</option>
+            <option>Local / Piețe</option>
+            <option>Instagram</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Data</label>
+          <input type="date" id="sv-date">
+        </div>
+      </div>
+      <div class="form-row one">
+        <div class="field">
+          <label>Note / Text marketing</label>
+          <textarea id="sv-notes" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-gold" onclick="doSave()">✦ Salvează</button>
+        <button class="btn btn-ghost" onclick="closeModal('save-modal')">Anulează</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD MODAL -->
+<div class="modal-bg" id="add-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Adaugă manual</h3>
+      <button class="modal-close" onclick="closeModal('add-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row one">
+        <div class="field">
+          <label>Nume *</label>
+          <input type="text" id="ad-name">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Tip</label>
+          <select id="ad-type">
+            <option value="brățară">Brățară</option>
+            <option value="cercei">Cercei</option>
+            <option value="colier">Colier</option>
+            <option value="inel">Inel</option>
+            <option value="set">Set</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select id="ad-status">
+            <option value="in-stock">În stoc</option>
+            <option value="listed">Listat</option>
+            <option value="sold">Vândut</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Cost (£)</label>
+          <input type="number" id="ad-cost" step="0.01" min="0" value="0">
+        </div>
+        <div class="field">
+          <label>Preț (£)</label>
+          <input type="number" id="ad-price" step="0.01" min="0" value="0">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Platformă</label>
+          <select id="ad-platform">
+            <option>Etsy</option>
+            <option>TikTok Shop</option>
+            <option>Local / Piețe</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Data</label>
+          <input type="date" id="ad-date">
+        </div>
+      </div>
+      <div class="form-row one">
+        <div class="field">
+          <label>Note</label>
+          <textarea id="ad-notes" rows="2"></textarea>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-gold" onclick="doAdd()">✦ Adaugă</button>
+        <button class="btn btn-ghost" onclick="closeModal('add-modal')">Anulează</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-bg" id="detail-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="detail-title">Detalii</h3>
+      <button class="modal-close" onclick="closeModal('detail-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="detail-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── CURSOR ───
+const cur = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+});
+function animRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+document.addEventListener('mousedown', () => { cur.style.transform = 'translate(-50%,-50%) scale(2)'; ring.style.transform = 'translate(-50%,-50%) scale(0.5)'; });
+document.addEventListener('mouseup', () => { cur.style.transform = 'translate(-50%,-50%) scale(1)'; ring.style.transform = 'translate(-50%,-50%) scale(1)'; });
+
+// ─── PARTICLES ───
+const pCont = document.getElementById('particles');
+for (let i = 0; i < 30; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.style.left = Math.random() * 100 + 'vw';
+  p.style.width = p.style.height = (Math.random() * 2 + 1) + 'px';
+  p.style.animationDuration = (Math.random() * 20 + 15) + 's';
+  p.style.animationDelay = (Math.random() * 20) + 's';
+  pCont.appendChild(p);
+}
+
+// ─── STATE ───
+let inventory = JSON.parse(localStorage.getItem('atelier_inv') || '[]');
+let currentImg = null;
+let currentAnalysis = null;
+let listingData = null;
+let ANTHROPIC_KEY = localStorage.getItem('atelier_key') || '';
+
+// ─── API KEY HELPERS ───
+function openKeyModal() {
+  document.getElementById('key-input').value = ANTHROPIC_KEY;
+  document.getElementById('key-modal').classList.add('open');
+}
+function saveKey() {
+  const k = document.getElementById('key-input').value.trim();
+  if (!k.startsWith('sk-ant-')) return toast('⚠️ Cheia trebuie să înceapă cu sk-ant-');
+  ANTHROPIC_KEY = k;
+  localStorage.setItem('atelier_key', k);
+  closeModal('key-modal');
+  toast('✓ API key salvat!');
+  updateKeyIndicator();
+}
+function updateKeyIndicator() {
+  const nav = document.getElementById('key-status');
+  if (!nav) return;
+  nav.textContent = ANTHROPIC_KEY ? '● API' : '○ API';
+  nav.style.color = ANTHROPIC_KEY ? 'var(--sage)' : 'var(--rose)';
+}
+setTimeout(updateKeyIndicator, 100);
+
+// ─── TABS ───
+document.querySelectorAll('.nav-tab').forEach(t => {
+  t.addEventListener('click', () => {
+    const tab = t.dataset.tab;
+    document.querySelectorAll('.nav-tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('sec-' + tab).classList.add('active');
+    if (tab === 'inventory') renderInv();
+    if (tab === 'stats') renderStats();
+    checkStaleAlert();
+  });
+});
+
+// ─── FILE UPLOAD ───
+function handleFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    currentImg = ev.target.result;
+    showPreview(currentImg);
+  };
+  reader.readAsDataURL(file);
+}
+
+function loadUrl() {
+  const url = document.getElementById('img-url').value.trim();
+  if (!url) return toast('Introdu un URL valid');
+  currentImg = url;
+  showPreview(url);
+  toast('✓ Imagine din URL');
+}
+
+function showPreview(src) {
+  document.getElementById('preview-img').src = src;
+  document.getElementById('preview-wrap').style.display = 'block';
+}
+
+function clearAll() {
+  currentImg = null; currentAnalysis = null;
+  document.getElementById('preview-wrap').style.display = 'none';
+  document.getElementById('preview-img').src = '';
+  document.getElementById('img-url').value = '';
+  document.getElementById('j-extra').value = '';
+  document.getElementById('file-input').value = '';
+  document.getElementById('ai-result').classList.remove('show');
+}
+
+// ─── AI ANALYSIS ───
+async function runAnalysis() {
+  if (!currentImg) return toast('⚠️ Încarcă o imagine mai întâi');
+  const type = document.getElementById('j-type').value;
+  const platform = document.getElementById('j-platform').value;
+  const occasion = document.getElementById('j-occasion').value;
+  const extra = document.getElementById('j-extra').value;
+
+  document.getElementById('spinner').classList.add('show');
+  document.getElementById('ai-result').classList.remove('show');
+
+  const sys = `Ești expert în bijuterii handmade, pricing și e-commerce UK. Analizezi bijuterii din imagini și răspunzi EXCLUSIV în JSON valid fără niciun text în afara JSON-ului.
+
+Răspunde cu acest JSON exact:
+{
+  "type": "tipul exact (brățară/cercei/colier/inel/set)",
+  "materials": "lista materiale cu cantități și cost individual în GBP, fiecare pe linie nouă cu \\n",
+  "cost_min": NUMBER,
+  "cost_max": NUMBER,
+  "price_budget": NUMBER,
+  "price_standard": NUMBER,
+  "price_premium": NUMBER,
+  "colors": ["#hex1", "#hex2", "#hex3", "#hex4"],
+  "platforms": {
+    "etsy": {"score": "A/B/C", "reason": "max 15 cuvinte", "badge": "best/good/ok"},
+    "tiktok": {"score": "A/B/C", "reason": "max 15 cuvinte", "badge": "best/good/ok"},
+    "local": {"score": "A/B/C", "reason": "max 15 cuvinte", "badge": "best/good/ok"}
+  },
+  "marketing": "text marketing captivant în engleză, 80-100 cuvinte, gata de copiat pe ${platform}",
+  "hashtags": ["#tag1","#tag2","#tag3","#tag4","#tag5","#tag6","#tag7","#tag8","#tag9","#tag10","#tag11","#tag12"],
+  "tip": "sfat specific pentru vânzări mai bune, max 30 cuvinte"
+}
+
+Regulă prețuri: budget = cost×2.5, standard = cost×3.5, premium = cost×5. Folosește costul mediu.`;
+
+  const userMsg = [];
+  if (currentImg.startsWith('data:')) {
+    const mime = currentImg.match(/data:([^;]+);/)?.[1] || 'image/jpeg';
+    userMsg.push({ type: 'image', source: { type: 'base64', media_type: mime, data: currentImg.split(',')[1] } });
+  } else {
+    userMsg.push({ type: 'image', source: { type: 'url', url: currentImg } });
+  }
+  userMsg.push({ type: 'text', text: `Analizează bijuteria.${type?' Tip:'+type+'.':''} Platformă principală: ${platform}. ${occasion?'Ocazie:'+occasion+'.':''} ${extra?'Extra:'+extra+'.':''}` });
+
+  if (!ANTHROPIC_KEY) {
+    document.getElementById('spinner').classList.remove('show');
+    openKeyModal();
+    return;
+  }
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: sys,
+        messages: [{ role: 'user', content: userMsg }]
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    const raw = (data.content?.[0]?.text || '').replace(/```json|```/g, '').trim();
+    const d = JSON.parse(raw);
+    currentAnalysis = d;
+    renderResult(d);
+  } catch(err) {
+    toast('❌ Eroare AI: ' + err.message);
+  } finally {
+    document.getElementById('spinner').classList.remove('show');
+  }
+}
+
+function renderResult(d) {
+  // KPIs
+  document.getElementById('r-type').textContent = d.type || '—';
+  const costMid = ((d.cost_min + d.cost_max) / 2).toFixed(2);
+  document.getElementById('r-cost').textContent = `£${d.cost_min}–£${d.cost_max}`;
+  document.getElementById('r-price').textContent = `£${d.price_standard}`;
+  const margin = d.cost_min > 0 ? ((d.price_standard - costMid) / costMid * 100).toFixed(0) : 0;
+  document.getElementById('r-margin').textContent = margin + '%';
+  document.querySelectorAll('.kpi-box').forEach(b => b.classList.add('loaded'));
+
+  // Mood colors
+  const mood = document.getElementById('r-mood');
+  mood.innerHTML = '';
+  (d.colors || []).forEach(c => {
+    const sw = document.createElement('div');
+    sw.className = 'mood-swatch';
+    sw.style.background = c;
+    sw.title = c;
+    sw.onclick = () => { navigator.clipboard.writeText(c); toast('✓ ' + c + ' copiat'); };
+    mood.appendChild(sw);
+  });
+  const ml = document.createElement('span');
+  ml.className = 'mood-label';
+  ml.textContent = 'Click pe culoare pentru hex code';
+  mood.appendChild(ml);
+
+  // Materials
+  document.getElementById('r-materials').innerHTML = (d.materials || '—').replace(/\n/g, '<br>');
+
+  // Price options
+  const po = document.getElementById('r-prices');
+  const costN = parseFloat(costMid);
+  po.innerHTML = [
+    { tier: 'Budget', val: d.price_budget, desc: 'Piețe locale · TikTok', m: d.cost_min > 0 ? (d.price_budget/costN).toFixed(1) : '—' },
+    { tier: 'Standard', val: d.price_standard, desc: 'Etsy · Instagram', m: d.cost_min > 0 ? (d.price_standard/costN).toFixed(1) : '—' },
+    { tier: 'Premium', val: d.price_premium, desc: 'Gift market · Featured', m: d.cost_min > 0 ? (d.price_premium/costN).toFixed(1) : '—' }
+  ].map(p => `<div class="price-opt" onclick="selectPrice(this, ${p.val})">
+    <div class="price-opt-tier">${p.tier}</div>
+    <div class="price-opt-val">£${p.val}</div>
+    <div class="price-opt-margin">×${p.m} ROI</div>
+    <div class="price-opt-label">${p.desc}</div>
+  </div>`).join('');
+
+  // Platforms
+  const pg = document.getElementById('r-platforms');
+  const plats = [
+    { name: 'Etsy', key: 'etsy' },
+    { name: 'TikTok Shop', key: 'tiktok' },
+    { name: 'Local', key: 'local' }
+  ];
+  pg.innerHTML = plats.map(pl => {
+    const info = d.platforms?.[pl.key] || { score: '—', reason: '—', badge: 'ok' };
+    return `<div class="plat-card">
+      <div class="plat-name">${pl.name}</div>
+      <div class="plat-score">${info.score}</div>
+      <div class="plat-reason">${info.reason}</div>
+      <span class="plat-badge ${info.badge}">${info.badge === 'best' ? '★ Recomandat' : info.badge === 'good' ? '✓ Bun' : '○ Alternativă'}</span>
+    </div>`;
+  }).join('');
+
+  // Marketing
+  document.getElementById('r-marketing').textContent = d.marketing || '—';
+
+  // Hashtags
+  const hw = document.getElementById('r-hashtags');
+  hw.innerHTML = (d.hashtags || []).map(h => `<span class="tag" onclick="copyText('${h}')">${h}</span>`).join('');
+
+  // Tip
+  document.getElementById('r-tip').textContent = d.tip || '—';
+
+  // Prefill save
+  document.getElementById('sv-type').value = detectTypeVal(d.type);
+  document.getElementById('sv-cost').value = costMid;
+  document.getElementById('sv-price').value = d.price_standard || '';
+  document.getElementById('sv-date').value = today();
+  document.getElementById('sv-notes').value = d.marketing || '';
+
+  document.getElementById('ai-result').classList.add('show');
+}
+
+function selectPrice(el, val) {
+  document.querySelectorAll('.price-opt').forEach(x => x.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('sv-price').value = val;
+}
+
+// ─── LISTING GENERATOR ───
+async function generateListing() {
+  const type = document.getElementById('lg-type').value;
+  const mat = document.getElementById('lg-material').value;
+  const style = document.getElementById('lg-style').value;
+  const price = document.getElementById('lg-price').value;
+  const unique = document.getElementById('lg-unique').value;
+
+  if (!mat) return toast('⚠️ Introdu materialul principal');
+
+  document.getElementById('lg-spinner').classList.add('show');
+  document.getElementById('lg-result').style.display = 'none';
+
+  const sys = `Ești expert SEO Etsy și copywriter pentru bijuterii handmade UK. Răspunzi EXCLUSIV în JSON valid:
+{
+  "title": "titlu Etsy max 140 caractere, cu cuvinte cheie principale la început",
+  "description": "descriere produs 130-150 cuvinte în engleză, cu paragraf de poveste, materiale, dimensiuni, îngrijire, livrare UK, personalizare",
+  "tags": ["tag1","tag2","tag3","tag4","tag5","tag6","tag7","tag8","tag9","tag10","tag11","tag12","tag13"],
+  "shipping": "sfaturi ambalare și livrare pentru bijuterii handmade UK, 2-3 rânduri",
+  "hook": "hook TikTok captivant, max 15 cuvinte, care oprește scroll-ul"
+}`;
+
+  if (!ANTHROPIC_KEY) {
+    document.getElementById('lg-spinner').classList.remove('show');
+    openKeyModal();
+    return;
+  }
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: sys,
+        messages: [{ role: 'user', content: `Bijuterie: ${type}. Material: ${mat}. Stil: ${style || 'handmade'}. Preț: £${price || '?'}. Unicitate: ${unique || 'handmade one-of-a-kind'}. Generează listing complet Etsy UK.` }]
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    const raw = (data.content?.[0]?.text || '').replace(/```json|```/g, '').trim();
+    const d = JSON.parse(raw);
+    listingData = d;
+
+    document.getElementById('lg-title').textContent = d.title || '—';
+    document.getElementById('lg-title-chars').textContent = `${(d.title||'').length}/140 caractere`;
+    document.getElementById('lg-desc').textContent = d.description || '—';
+    document.getElementById('lg-tags').textContent = (d.tags || []).join(', ');
+    const tw = document.getElementById('lg-tags-wrap');
+    tw.innerHTML = (d.tags || []).map(t => `<span class="tag" onclick="copyText('${t}')">${t}</span>`).join('');
+    document.getElementById('lg-shipping').textContent = d.shipping || '—';
+    document.getElementById('lg-hook').textContent = d.hook || '—';
+    document.getElementById('lg-result').style.display = 'block';
+  } catch(err) {
+    toast('❌ ' + err.message);
+  } finally {
+    document.getElementById('lg-spinner').classList.remove('show');
+  }
+}
+
+function goListing() {
+  document.querySelectorAll('.nav-tab').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(x => x.classList.remove('active'));
+  document.querySelector('[data-tab="listing"]').classList.add('active');
+  document.getElementById('sec-listing').classList.add('active');
+  if (currentAnalysis) {
+    document.getElementById('lg-material').value = '';
+    document.getElementById('lg-type').value = detectTypeVal(currentAnalysis.type) === 'brățară' ? 'bracelet' : detectTypeVal(currentAnalysis.type);
+  }
+}
+
+function copyAll() {
+  if (!listingData) return;
+  const txt = `TITLE:\n${listingData.title}\n\nDESCRIPTION:\n${listingData.description}\n\nTAGS:\n${(listingData.tags||[]).join(', ')}\n\nSHIPPING:\n${listingData.shipping}\n\nTIKTOK HOOK:\n${listingData.hook}`;
+  navigator.clipboard.writeText(txt).then(() => toast('✓ Tot listing-ul copiat!'));
+}
+
+// ─── PRICE CALCULATOR ───
+function calcPrice() {
+  const mat = parseFloat(document.getElementById('c-mat').value) || 0;
+  const time = parseFloat(document.getElementById('c-time').value) || 0;
+  const rate = parseFloat(document.getElementById('c-rate').value) || 12;
+  const pack = parseFloat(document.getElementById('c-pack').value) || 0;
+  const fees = parseFloat(document.getElementById('c-fees').value) || 6.5;
+  const ship = parseFloat(document.getElementById('c-ship').value) || 0;
+
+  const labour = time * rate;
+  const base = mat + labour + pack;
+  const feeAmt = base * (fees / 100);
+  const total = base + feeAmt + ship;
+  const breakeven = total * 1.1;
+
+  document.getElementById('c-total').textContent = '£' + base.toFixed(2);
+  document.getElementById('c-breakeven').textContent = '£' + breakeven.toFixed(2);
+
+  const b = roundNice(total * 2.5);
+  const s = roundNice(total * 3.5);
+  const p = roundNice(total * 5);
+
+  document.getElementById('c-budget').textContent = '£' + b;
+  document.getElementById('c-standard').textContent = '£' + s;
+  document.getElementById('c-premium').textContent = '£' + p;
+  document.getElementById('c-bm').textContent = '×' + (b/total).toFixed(1) + ' ROI';
+  document.getElementById('c-sm').textContent = '×' + (s/total).toFixed(1) + ' ROI';
+  document.getElementById('c-pm').textContent = '×' + (p/total).toFixed(1) + ' ROI';
+
+  document.getElementById('calc-result').style.display = total > 0 ? 'block' : 'none';
+}
+
+function roundNice(n) {
+  if (n < 10) return (Math.ceil(n * 4) / 4).toFixed(2);
+  if (n < 50) return (Math.ceil(n) - 0.01).toFixed(2);
+  return Math.ceil(n / 5) * 5 - 0.01;
+}
+
+// ─── INVENTORY ───
+function renderInv() {
+  const q = document.getElementById('inv-search').value.toLowerCase();
+  const ft = document.getElementById('inv-type').value;
+  const fs = document.getElementById('inv-status').value;
+  const sort = document.getElementById('inv-sort').value;
+
+  let items = inventory.filter(i => {
+    if (q && !i.name.toLowerCase().includes(q)) return false;
+    if (ft && i.type !== ft) return false;
+    if (fs && i.status !== fs) return false;
+    return true;
+  });
+
+  if (sort === 'price-desc') items.sort((a,b) => b.price - a.price);
+  else if (sort === 'profit-desc') items.sort((a,b) => (b.price-b.cost) - (a.price-a.cost));
+  else items.sort((a,b) => b.id - a.id);
+
+  const grid = document.getElementById('inv-grid');
+  const empty = document.getElementById('inv-empty');
+
+  if (!items.length) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  const emoji = { brățară:'📿', cercei:'💎', colier:'🪬', inel:'💍', set:'✨' };
+  const sc = { 'in-stock':'s-stock', listed:'s-listed', sold:'s-sold' };
+  const sl = { 'in-stock':'În stoc', listed:'Listat', sold:'Vândut' };
+
+  grid.innerHTML = items.map(item => {
+    const profit = item.price - item.cost;
+    const mult = item.cost > 0 ? (item.price / item.cost).toFixed(1) : '—';
+    const imgHtml = item.image
+      ? `<img src="${item.image}" alt="${item.name}" loading="lazy">`
+      : `<span>${emoji[item.type]||'◎'}</span>`;
+    return `<div class="jcard" onclick="showDetail(${item.id})">
+      <div class="jcard-img">
+        ${imgHtml}
+        <span class="jcard-status ${sc[item.status]||''}">${sl[item.status]||item.status}</span>
+      </div>
+      <div class="jcard-body">
+        <div class="jcard-name">${item.name}</div>
+        <div class="jcard-type">${item.type} · ${item.platform||'—'}</div>
+        <div class="jcard-prices">
+          <div>
+            <div class="jcard-cost">Cost £${item.cost.toFixed(2)}</div>
+            <div class="jcard-profit">+£${profit.toFixed(2)} · ×${mult}</div>
+          </div>
+          <div class="jcard-price">£${item.price.toFixed(2)}</div>
+        </div>
+        <div class="jcard-actions" onclick="event.stopPropagation()">
+          ${item.status !== 'sold' ? `<button class="btn btn-ghost btn-sm" onclick="markSold(${item.id})">✓ Vândut</button>` : ''}
+          <button class="btn btn-danger btn-sm" onclick="delItem(${item.id})">✕</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function showDetail(id) {
+  const item = inventory.find(i => i.id === id);
+  if (!item) return;
+  document.getElementById('detail-title').textContent = item.name;
+  const profit = item.price - item.cost;
+  const mult = item.cost > 0 ? (item.price/item.cost).toFixed(1) : '—';
+  document.getElementById('detail-body').innerHTML = `
+    ${item.image ? `<img src="${item.image}" style="width:100%;max-height:260px;object-fit:contain;border-radius:2px;margin-bottom:18px;background:var(--panel);">` : ''}
+    <div class="form-row" style="margin-bottom:16px;">
+      ${[
+        ['Tipo', item.type], ['Status', item.status], ['Platformă', item.platform||'—'], ['Data', item.date||'—'],
+        ['Cost', '£'+item.cost.toFixed(2)], ['Preț', '£'+item.price.toFixed(2)], ['Profit', '£'+profit.toFixed(2)], ['ROI', '×'+mult]
+      ].map(([l,v]) => `<div class="field"><label>${l}</label><div style="padding:10px 0;font-size:0.9rem;color:var(--text2);">${v}</div></div>`).join('')}
+    </div>
+    ${item.notes ? `<div class="info-block"><div class="info-block-label" style="margin-bottom:8px;">Note / Marketing <button class="btn btn-ghost btn-sm" onclick="copyText(\`${item.notes.replace(/`/g,"'")}\`)">↗ Copiază</button></div><div class="info-block-text">${item.notes}</div></div>` : ''}
+    <div class="btn-row" style="margin-top:16px;">
+      ${item.status !== 'sold' ? `<button class="btn btn-gold btn-sm" onclick="markSold(${item.id});closeModal('detail-modal')">✓ Marchează vândut</button>` : ''}
+      <button class="btn btn-danger btn-sm" onclick="delItem(${item.id});closeModal('detail-modal')">✕ Șterge</button>
+    </div>`;
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+function markSold(id) {
+  const item = inventory.find(i => i.id === id);
+  if (item) { item.status = 'sold'; persist(); renderInv(); updateHeader(); toast('✓ Marcată ca vândută!'); }
+}
+
+function delItem(id) {
+  if (!confirm('Ștergi această bijuterie?')) return;
+  inventory = inventory.filter(i => i.id !== id);
+  persist(); renderInv(); updateHeader(); toast('✓ Ștearsă');
+}
+
+function exportCSV() {
+  if (!inventory.length) return toast('Inventarul e gol');
+  const rows = [['Nume','Tip','Status','Platformă','Cost','Preț','Profit','Data']];
+  inventory.forEach(i => rows.push([
+    `"${i.name}"`, i.type, i.status, i.platform||'',
+    i.cost.toFixed(2), i.price.toFixed(2), (i.price-i.cost).toFixed(2), i.date||''
+  ]));
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'atelier_inventory.csv';
+  a.click();
+  toast('✓ CSV exportat!');
+}
+
+// ─── STATS ───
+function renderStats() {
+  const total = inventory.length;
+  const sold = inventory.filter(i => i.status === 'sold');
+  const listed = inventory.filter(i => i.status === 'listed');
+  const stock = inventory.filter(i => i.status === 'in-stock');
+  const revenue = sold.reduce((s,i) => s+i.price, 0);
+  const costs = sold.reduce((s,i) => s+i.cost, 0);
+  const profit = revenue - costs;
+  const avgPrice = sold.length ? revenue/sold.length : 0;
+  const potential = inventory.filter(i=>i.status!=='sold').reduce((s,i)=>s+i.price,0);
+  const totalInvested = inventory.reduce((s,i)=>s+i.cost,0);
+
+  document.getElementById('stats-kpis').innerHTML = [
+    { val: total, lbl: 'Total piese', trend: `${stock.length} stoc · ${listed.length} listate` },
+    { val: sold.length, lbl: 'Vândute', trend: `rata: ${total>0?(sold.length/total*100).toFixed(0):0}%` },
+    { val: '£'+revenue.toFixed(0), lbl: 'Venit total', trend: `din ${sold.length} vânzări` },
+    { val: '£'+profit.toFixed(0), lbl: 'Profit net', trend: `margine: ${costs>0?(profit/costs*100).toFixed(0):0}%` },
+    { val: '£'+avgPrice.toFixed(0), lbl: 'Preț mediu', trend: 'per piesă vândută' },
+    { val: '£'+potential.toFixed(0), lbl: 'Potențial', trend: `${inventory.filter(i=>i.status!=='sold').length} piese nevândute` }
+  ].map(s => `<div class="skpi">
+    <div class="skpi-val">${s.val}</div>
+    <div class="skpi-lbl">${s.lbl}</div>
+    <div class="skpi-trend">${s.trend}</div>
+  </div>`).join('');
+
+  // Breakdown by type
+  const types = ['brățară','cercei','colier','inel','set'];
+  const maxRev = Math.max(...types.map(t => inventory.filter(i=>i.type===t&&i.status==='sold').reduce((s,i)=>s+i.price,0)), 1);
+  document.getElementById('breakdown-rows').innerHTML = types.map(t => {
+    const items = inventory.filter(i=>i.type===t);
+    if (!items.length) return '';
+    const rev = items.filter(i=>i.status==='sold').reduce((s,i)=>s+i.price,0);
+    const pct = (rev/maxRev*100).toFixed(0);
+    return `<div class="breakdown-row">
+      <div class="breakdown-name">${t}</div>
+      <div class="breakdown-bar-wrap"><div class="breakdown-bar" style="width:${pct}%"></div></div>
+      <div class="breakdown-vals">
+        <div class="breakdown-val"><div class="breakdown-val-num">${items.length}</div><div class="breakdown-val-lbl">piese</div></div>
+        <div class="breakdown-val"><div class="breakdown-val-num">£${rev.toFixed(0)}</div><div class="breakdown-val-lbl">venit</div></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // By platform
+  const platforms = [...new Set(inventory.map(i=>i.platform).filter(Boolean))];
+  const maxPRev = Math.max(...platforms.map(p => inventory.filter(i=>i.platform===p&&i.status==='sold').reduce((s,i)=>s+i.price,0)), 1);
+  document.getElementById('plat-rows').innerHTML = platforms.map(p => {
+    const items = inventory.filter(i=>i.platform===p);
+    const rev = items.filter(i=>i.status==='sold').reduce((s,i)=>s+i.price,0);
+    const pct = (rev/maxPRev*100).toFixed(0);
+    return `<div class="breakdown-row">
+      <div class="breakdown-name">${p}</div>
+      <div class="breakdown-bar-wrap"><div class="breakdown-bar" style="width:${pct}%"></div></div>
+      <div class="breakdown-vals">
+        <div class="breakdown-val"><div class="breakdown-val-num">${items.length}</div><div class="breakdown-val-lbl">piese</div></div>
+        <div class="breakdown-val"><div class="breakdown-val-num">£${rev.toFixed(0)}</div><div class="breakdown-val-lbl">venit</div></div>
+      </div>
+    </div>`;
+  }).join('') || '<div style="padding:16px 20px;font-size:0.78rem;color:var(--muted);">Nicio platformă înregistrată</div>';
+}
+
+// ─── MODALS ───
+function openSave() {
+  document.getElementById('sv-name').value = '';
+  document.getElementById('save-modal').classList.add('open');
+}
+function openAddModal() {
+  document.getElementById('ad-date').value = today();
+  document.getElementById('add-modal').classList.add('open');
+}
+function openSaveFromListing() {
+  document.getElementById('sv-date').value = today();
+  if (listingData) document.getElementById('sv-name').value = (listingData.title||'').substring(0,60);
+  document.getElementById('save-modal').classList.add('open');
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-bg').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+});
+
+function doSave() {
+  const name = document.getElementById('sv-name').value.trim();
+  if (!name) return toast('⚠️ Introdu un nume');
+  const item = {
+    id: Date.now(),
+    name,
+    type: document.getElementById('sv-type').value,
+    status: document.getElementById('sv-status').value,
+    cost: parseFloat(document.getElementById('sv-cost').value)||0,
+    price: parseFloat(document.getElementById('sv-price').value)||0,
+    platform: document.getElementById('sv-platform').value,
+    date: document.getElementById('sv-date').value,
+    notes: document.getElementById('sv-notes').value,
+    image: currentImg || null,
+    analysis: currentAnalysis || null
+  };
+  inventory.unshift(item);
+  persist();
+  closeModal('save-modal');
+  toast('✓ Bijuterie salvată!');
+}
+
+function doAdd() {
+  const name = document.getElementById('ad-name').value.trim();
+  if (!name) return toast('⚠️ Introdu un nume');
+  inventory.unshift({
+    id: Date.now(), name,
+    type: document.getElementById('ad-type').value,
+    status: document.getElementById('ad-status').value,
+    cost: parseFloat(document.getElementById('ad-cost').value)||0,
+    price: parseFloat(document.getElementById('ad-price').value)||0,
+    platform: document.getElementById('ad-platform').value,
+    date: document.getElementById('ad-date').value,
+    notes: document.getElementById('ad-notes').value,
+    image: null, analysis: null
+  });
+  persist();
+  closeModal('add-modal');
+  renderInv();
+  toast('✓ Adăugat!');
+}
+
+// ─── HELPERS ───
+function persist() {
+  localStorage.setItem('atelier_inv', JSON.stringify(inventory));
+  updateHeader();
+}
+
+function updateHeader() {
+  const sold = inventory.filter(i=>i.status==='sold');
+  document.getElementById('h-pieces').textContent = inventory.length;
+  document.getElementById('h-sold').textContent = sold.length;
+  document.getElementById('h-revenue').textContent = '£' + sold.reduce((s,i)=>s+i.price,0).toFixed(0);
+  document.getElementById('h-profit').textContent = '£' + sold.reduce((s,i)=>s+(i.price-i.cost),0).toFixed(0);
+}
+
+function checkStaleAlert() {
+  const stale = inventory.filter(i=>i.status==='in-stock').length;
+  const banner = document.getElementById('stale-alert');
+  if (stale >= 5) {
+    banner.innerHTML = `⚠️ Ai ${stale} piese nevândute în stoc — verifică inventarul și ajustează prețurile.`;
+    banner.classList.add('show');
+  } else banner.classList.remove('show');
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function copyEl(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent).then(() => toast('✓ Copiat!'));
+}
+
+function copyText(txt) {
+  navigator.clipboard.writeText(txt).then(() => toast('✓ ' + txt.substring(0,20) + '...'));
+}
+
+function copyHashtags() {
+  const tags = [...document.getElementById('r-hashtags').querySelectorAll('.tag')].map(t=>t.textContent).join(' ');
+  navigator.clipboard.writeText(tags).then(() => toast('✓ Hashtag-uri copiate!'));
+}
+
+function detectTypeVal(str) {
+  if (!str) return 'brățară';
+  const s = str.toLowerCase();
+  if (s.includes('cercel')||s.includes('earring')) return 'cercei';
+  if (s.includes('colier')||s.includes('necklace')) return 'colier';
+  if (s.includes('inel')||s.includes('ring')) return 'inel';
+  if (s.includes('set')) return 'set';
+  return 'brățară';
+}
+
+function today() { return new Date().toISOString().split('T')[0]; }
+
+// ─── INIT ───
+updateHeader();
+checkStaleAlert();
+
+// Migrate old data key if exists
+const old = localStorage.getItem('jt_inventory');
+if (old && !inventory.length) {
+  try { inventory = JSON.parse(old); persist(); } catch(e){}
+}
+</script>
+<!-- API KEY MODAL -->
+<div class="modal-bg" id="key-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Configurează API Key</h3>
+      <button class="modal-close" onclick="closeModal('key-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.78rem;color:var(--text2);line-height:1.7;margin-bottom:16px;">
+        Introdu cheia Anthropic API. Se salvează local pe dispozitivul tău, nu se transmite nicăieri altundeva.<br><br>
+        Obține cheia de pe <strong style="color:var(--gold);">console.anthropic.com → API Keys</strong>
+      </p>
+      <div class="form-row one">
+        <div class="field">
+          <label>Anthropic API Key</label>
+          <input type="password" id="key-input" placeholder="sk-ant-api03-..." autocomplete="off">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-gold" onclick="saveKey()">✦ Salvează</button>
+        <button class="btn btn-ghost" onclick="closeModal('key-modal')">Anulează</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
