@@ -1012,6 +1012,7 @@ main {
       <div class="hkpi-val" id="h-profit">£0</div>
       <div class="hkpi-lbl">Profit</div>
     </div>
+
   </div>
 </header>
 
@@ -1021,6 +1022,7 @@ main {
   <div class="nav-tab" data-tab="calc">💰 Price Calculator</div>
   <div class="nav-tab" data-tab="inventory">💍 Inventar</div>
   <div class="nav-tab" data-tab="stats">◎ Statistici</div>
+  <div class="nav-tab" id="key-status" onclick="openKeyModal()" style="color:var(--rose);min-width:60px;">○ API</div>
 </nav>
 
 <main>
@@ -1038,7 +1040,7 @@ main {
 
   <!-- UPLOAD -->
   <div class="upload-zone" id="upload-zone">
-    <input type="file" id="file-input" accept="image/*" onchange="handleFile(event)">
+    <input type="file" id="file-input" accept="image/*" capture="environment" onchange="handleFile(event)">
     <div class="upload-icon-large">◎</div>
     <div class="upload-label">Încarcă fotografia bijuteriei</div>
     <div class="upload-sub">JPG, PNG, WEBP · orice rezoluție</div>
@@ -1629,6 +1631,29 @@ let inventory = JSON.parse(localStorage.getItem('atelier_inv') || '[]');
 let currentImg = null;
 let currentAnalysis = null;
 let listingData = null;
+let ANTHROPIC_KEY = localStorage.getItem('atelier_key') || '';
+
+// ─── API KEY HELPERS ───
+function openKeyModal() {
+  document.getElementById('key-input').value = ANTHROPIC_KEY;
+  document.getElementById('key-modal').classList.add('open');
+}
+function saveKey() {
+  const k = document.getElementById('key-input').value.trim();
+  if (!k.startsWith('sk-ant-')) return toast('⚠️ Cheia trebuie să înceapă cu sk-ant-');
+  ANTHROPIC_KEY = k;
+  localStorage.setItem('atelier_key', k);
+  closeModal('key-modal');
+  toast('✓ API key salvat!');
+  updateKeyIndicator();
+}
+function updateKeyIndicator() {
+  const nav = document.getElementById('key-status');
+  if (!nav) return;
+  nav.textContent = ANTHROPIC_KEY ? '● API' : '○ API';
+  nav.style.color = ANTHROPIC_KEY ? 'var(--sage)' : 'var(--rose)';
+}
+setTimeout(updateKeyIndicator, 100);
 
 // ─── TABS ───
 document.querySelectorAll('.nav-tab').forEach(t => {
@@ -1723,10 +1748,20 @@ Regulă prețuri: budget = cost×2.5, standard = cost×3.5, premium = cost×5. F
   }
   userMsg.push({ type: 'text', text: `Analizează bijuteria.${type?' Tip:'+type+'.':''} Platformă principală: ${platform}. ${occasion?'Ocazie:'+occasion+'.':''} ${extra?'Extra:'+extra+'.':''}` });
 
+  if (!ANTHROPIC_KEY) {
+    document.getElementById('spinner').classList.remove('show');
+    openKeyModal();
+    return;
+  }
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
@@ -1734,6 +1769,10 @@ Regulă prețuri: budget = cost×2.5, standard = cost×3.5, premium = cost×5. F
         messages: [{ role: 'user', content: userMsg }]
       })
     });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
     const data = await res.json();
     const raw = (data.content?.[0]?.text || '').replace(/```json|```/g, '').trim();
     const d = JSON.parse(raw);
@@ -1854,10 +1893,20 @@ async function generateListing() {
   "hook": "hook TikTok captivant, max 15 cuvinte, care oprește scroll-ul"
 }`;
 
+  if (!ANTHROPIC_KEY) {
+    document.getElementById('lg-spinner').classList.remove('show');
+    openKeyModal();
+    return;
+  }
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
@@ -1865,6 +1914,10 @@ async function generateListing() {
         messages: [{ role: 'user', content: `Bijuterie: ${type}. Material: ${mat}. Stil: ${style || 'handmade'}. Preț: £${price || '?'}. Unicitate: ${unique || 'handmade one-of-a-kind'}. Generează listing complet Etsy UK.` }]
       })
     });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
     const data = await res.json();
     const raw = (data.content?.[0]?.text || '').replace(/```json|```/g, '').trim();
     const d = JSON.parse(raw);
@@ -2238,5 +2291,31 @@ if (old && !inventory.length) {
   try { inventory = JSON.parse(old); persist(); } catch(e){}
 }
 </script>
+<!-- API KEY MODAL -->
+<div class="modal-bg" id="key-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Configurează API Key</h3>
+      <button class="modal-close" onclick="closeModal('key-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.78rem;color:var(--text2);line-height:1.7;margin-bottom:16px;">
+        Introdu cheia Anthropic API. Se salvează local pe dispozitivul tău, nu se transmite nicăieri altundeva.<br><br>
+        Obține cheia de pe <strong style="color:var(--gold);">console.anthropic.com → API Keys</strong>
+      </p>
+      <div class="form-row one">
+        <div class="field">
+          <label>Anthropic API Key</label>
+          <input type="password" id="key-input" placeholder="sk-ant-api03-..." autocomplete="off">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-gold" onclick="saveKey()">✦ Salvează</button>
+        <button class="btn btn-ghost" onclick="closeModal('key-modal')">Anulează</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
